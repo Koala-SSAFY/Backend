@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -38,14 +39,17 @@ public class StudyTime implements Serializable {
 	@JoinColumn(name = "user_id", insertable = false, updatable = false)
 	private User user;
 
+	@Setter
 	@Builder.Default
 	@Column(name = "talk_time")
 	private Integer talkTime = 0;
 
+	@Setter
 	@Builder.Default
 	@Column(name = "sentence_num")
 	private Integer sentenceNum = 0;
 
+	@Setter
 	@Builder.Default
 	@Column(name = "lecture_num")
 	private Integer lectureNum = 0;
