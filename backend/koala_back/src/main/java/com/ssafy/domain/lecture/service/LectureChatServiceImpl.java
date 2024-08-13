@@ -19,7 +19,6 @@ public class LectureChatServiceImpl implements LectureChatService {
 
 	@Override
 	public void sendLectureChat(Long lectureId, LectureChatRequest chat) {
-		System.out.println(lectureId);
 		messagingTemplate.convertAndSend("/lectures/" + lectureId, LectureChatResponse.builder()
 			.sender(chat.getSender())
 			.message(chat.getMessage())
