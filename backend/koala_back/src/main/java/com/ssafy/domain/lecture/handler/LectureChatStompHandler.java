@@ -1,4 +1,4 @@
-package com.ssafy.domain.lecture.chat.handler;
+package com.ssafy.domain.lecture.handler;
 
 import java.time.LocalDateTime;
 
