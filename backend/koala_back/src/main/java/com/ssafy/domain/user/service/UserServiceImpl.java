@@ -48,11 +48,12 @@ public class UserServiceImpl implements UserService {
 	private final CacheService cacheService;
 	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
-	private final KoalaService koalaService;
 	private final AuthRepository authRepository;
+	private final RankingRepository rankingRepository;
+	private final KoalaService koalaService;
+	private final RankingService rankingService;
 	private final StudyTimeService studyTimeService;
 	private final AiTalkLogService aiTalkLogService;
-	private final RankingRepository rankingRepository;
 
 	@Override
 	@Transactional
@@ -69,6 +70,7 @@ public class UserServiceImpl implements UserService {
 		studyTimeService.initStudyTime(user.getUserId());
 		aiTalkLogService.initAiTalkLog(user);
 		koalaService.addKoala(user.getUserId());
+		rankingService.createUserRanking(user);
 
 		return UserFindResponse.toDto(user);
 	}
