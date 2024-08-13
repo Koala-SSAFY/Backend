@@ -1,10 +1,13 @@
 package com.ssafy.domain.lecture.service;
 
+import java.time.LocalDateTime;
+
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssafy.domain.lecture.chat.LectureChatRoom;
-import com.ssafy.domain.lecture.chat.LectureChatRoomManager;
+import com.ssafy.domain.lecture.model.dto.request.LectureChatRequest;
+import com.ssafy.domain.lecture.model.dto.response.LectureChatResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -12,21 +15,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LectureChatServiceImpl implements LectureChatService {
-
-	private final LectureChatRoomManager lectureChatRoomManager;
-
-	@Override
-	@Transactional
-	public LectureChatRoom makeLectureChatRoom(Long lectureId) {
-		LectureChatRoom chatRoom = LectureChatRoom.builder().lectureId(lectureId).build();
-		lectureChatRoomManager.getRoomSessions().put(lectureId, chatRoom);
-		return chatRoom;
-	}
+	private final SimpMessageSendingOperations messagingTemplate;
 
 	@Override
-	@Transactional
-	public void deleteLectureChatRoom(Long lectureId) {
-		lectureChatRoomManager.getRoomSessions().remove(lectureId);
+	public void sendLectureChat(Long lectureId, LectureChatRequest chat) {
+		System.out.println(lectureId);
+		messagingTemplate.convertAndSend("/lectures/" + lectureId, LectureChatResponse.builder()
+			.sender(chat.getSender())
+			.message(chat.getMessage())
+			.sendingTime(LocalDateTime.now())
+			.build());
 	}
 
 }
