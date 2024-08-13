@@ -30,6 +30,9 @@ public class LectureResponse {
 	@JsonProperty("lecture_schedule")
 	private String lectureSchedule;
 
+	@JsonProperty("lecture_img_url")
+	private String lectureImgUrl;
+
 	public static LectureResponse toDto(Lecture lecture) {
 		return LectureResponse.builder()
 			.lectureId(lecture.getLectureId())
@@ -38,6 +41,7 @@ public class LectureResponse {
 			.lectureDetail(lecture.getLectureDetail())
 			.sessionId(lecture.getSessionId())
 			.lectureSchedule(lecture.getLectureSchedule())
+			.lectureImgUrl(lecture.getLectureImgUrl())
 			.build();
 	}
 

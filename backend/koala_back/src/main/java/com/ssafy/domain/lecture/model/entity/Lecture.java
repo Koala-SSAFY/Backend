@@ -63,6 +63,9 @@ public class Lecture {
 	@Column(name = "lecture_schedule")
 	private String lectureSchedule = "월 수 금 15:00 ~ 17:00";
 
+	@Column(name = "lecture_img_url")
+	private String lectureImgUrl;
+
 	@OneToMany(mappedBy = "lecture", fetch = LAZY)
 	private List<LectureNote> lectureNotes = new ArrayList<>();
 
