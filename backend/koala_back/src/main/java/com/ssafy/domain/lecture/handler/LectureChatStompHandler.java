@@ -1,20 +1,15 @@
 package com.ssafy.domain.lecture.handler;
 
-import java.time.LocalDateTime;
-
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.ssafy.domain.lecture.model.dto.response.LectureChatResponse;
 import com.ssafy.global.auth.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -31,8 +26,6 @@ public class LectureChatStompHandler implements ChannelInterceptor {
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
 		// STOMP 메시지의 헤더 정보를 다루는 클래스로 헤더 정보 추출
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-		log.info("요청 시작");
-
 		// 클라이언트가 WebSocket 연결을 시도할 때만 검증을 수행
 		if (accessor.getCommand() == StompCommand.CONNECT) {
 			String bearerToken = accessor.getFirstNativeHeader("Authorization");
@@ -62,6 +55,5 @@ public class LectureChatStompHandler implements ChannelInterceptor {
 		System.out.println("메세지 전송해요");
 		return message;
 	}
-
 
 }
