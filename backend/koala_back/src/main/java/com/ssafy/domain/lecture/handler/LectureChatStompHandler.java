@@ -29,7 +29,7 @@ public class LectureChatStompHandler implements ChannelInterceptor {
 		// 클라이언트가 WebSocket 연결을 시도할 때만 검증을 수행
 		if (accessor.getCommand() == StompCommand.CONNECT) {
 			String bearerToken = accessor.getFirstNativeHeader("Authorization");
-			System.out.println(bearerToken);
+			log.info("Bearer token: {}", bearerToken);
 			if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
 				String token = bearerToken.substring(7);
 				log.info("CONNECT attempt with token: {}", bearerToken);
