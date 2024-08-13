@@ -52,7 +52,6 @@ public class LectureChatStompHandler implements ChannelInterceptor {
 				throw new AccessDeniedException("Authorization 헤더가 잘못되었습니다.");
 			}
 		}
-		System.out.println("메세지 전송해요");
 		return message;
 	}
 
