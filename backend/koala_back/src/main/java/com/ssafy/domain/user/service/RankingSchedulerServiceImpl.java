@@ -46,7 +46,7 @@ public class RankingSchedulerServiceImpl implements RankingSchedulerService {
 			}
 
 			Ranking ranking = Ranking.builder()
-				.userId(user.getUserId())
+				.user(user)
 				.ranking(currentRank)
 				.build();
 
