@@ -72,12 +72,4 @@ public class Lecture {
 	@OneToMany(mappedBy = "lecture", cascade = ALL, fetch = LAZY, orphanRemoval = true)
 	private List<RegisteredLecture> registeredLectures = new ArrayList<>();
 
-	public Lecture(User teacher, String lectureTitle, String lectureDetail, String lectureUrl, int isOpen) {
-		this.teacher = teacher;
-		this.lectureTitle = lectureTitle;
-		this.lectureDetail = lectureDetail;
-		this.lectureUrl = lectureUrl;
-		this.isOpen = isOpen;
-	}
-
 }
