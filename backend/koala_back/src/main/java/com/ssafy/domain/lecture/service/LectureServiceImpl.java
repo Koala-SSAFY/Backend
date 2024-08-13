@@ -38,7 +38,7 @@ public class LectureServiceImpl implements LectureService {
 
 	@Override
 	public List<LectureResponse> getAllLecture() {
-		List<Lecture> lectures = lectureRepository.findAll();
+		List<Lecture> lectures = lectureRepository.findAllByIsOpen();
 		return lectures.stream().map(LectureResponse::toDto).collect(Collectors.toList());
 	}
 
@@ -84,7 +84,7 @@ public class LectureServiceImpl implements LectureService {
 
 	@Override
 	public List<LectureNoteResponse> getLectureNote(Long lectureId) {
-		return lectureNoteRepository.findByLectureId(userInfoProvider.getCurrentUserId(),lectureId)
+		return lectureNoteRepository.findByLectureId(userInfoProvider.getCurrentUserId(), lectureId)
 			.stream()
 			.map(LectureNoteResponse::toDto)
 			.collect(Collectors.toList());
