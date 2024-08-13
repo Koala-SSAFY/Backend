@@ -27,6 +27,9 @@ public class LectureResponse {
 	@JsonProperty("session_id")
 	private String sessionId;
 
+	@JsonProperty("lecture_schedule")
+	private String lectureSchedule;
+
 	public static LectureResponse toDto(Lecture lecture) {
 		return LectureResponse.builder()
 			.lectureId(lecture.getLectureId())
@@ -34,6 +37,7 @@ public class LectureResponse {
 			.lectureTitle(lecture.getLectureTitle())
 			.lectureDetail(lecture.getLectureDetail())
 			.sessionId(lecture.getSessionId())
+			.lectureSchedule(lecture.getLectureSchedule())
 			.build();
 	}
 
