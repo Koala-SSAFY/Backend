@@ -1,11 +1,9 @@
 package com.ssafy.domain.lecture.service;
 
-import com.ssafy.domain.lecture.chat.LectureChatRoom;
+import com.ssafy.domain.lecture.model.dto.request.LectureChatRequest;
 
 public interface LectureChatService {
 
-	LectureChatRoom makeLectureChatRoom(Long lectureId);
-
-	void deleteLectureChatRoom(Long lectureId);
+	void sendLectureChat(Long lectureId, LectureChatRequest chat);
 
 }
