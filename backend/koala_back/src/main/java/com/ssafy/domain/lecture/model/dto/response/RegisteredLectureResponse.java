@@ -19,11 +19,15 @@ public class RegisteredLectureResponse {
 	@JsonProperty("lecture_title")
 	private String lectureTitle;
 
+	@JsonProperty("lecture_img_url")
+	private String lectureImgUrl;
+
 	public static RegisteredLectureResponse toDto(RegisteredLecture lecture) {
 		return RegisteredLectureResponse.builder()
 			.lectureId(lecture.getLecture().getLectureId())
 			.teacherName(lecture.getLecture().getTeacher().getUsername())
 			.lectureTitle(lecture.getLecture().getLectureTitle())
+			.lectureImgUrl(lecture.getLecture().getLectureImgUrl())
 			.build();
 	}
 }

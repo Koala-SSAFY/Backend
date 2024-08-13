@@ -59,6 +59,13 @@ public class Lecture {
 	@Column(name = "is_open")
 	private int isOpen = 1;
 
+	@Builder.Default
+	@Column(name = "lecture_schedule")
+	private String lectureSchedule = "월 수 금 15:00 ~ 17:00";
+
+	@Column(name = "lecture_img_url")
+	private String lectureImgUrl;
+
 	@OneToMany(mappedBy = "lecture", fetch = LAZY)
 	private List<LectureNote> lectureNotes = new ArrayList<>();
 
@@ -67,13 +74,5 @@ public class Lecture {
 
 	@OneToMany(mappedBy = "lecture", cascade = ALL, fetch = LAZY, orphanRemoval = true)
 	private List<RegisteredLecture> registeredLectures = new ArrayList<>();
-
-	public Lecture(User teacher, String lectureTitle, String lectureDetail, String lectureUrl, int isOpen) {
-		this.teacher = teacher;
-		this.lectureTitle = lectureTitle;
-		this.lectureDetail = lectureDetail;
-		this.lectureUrl = lectureUrl;
-		this.isOpen = isOpen;
-	}
 
 }
