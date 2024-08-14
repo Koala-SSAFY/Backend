@@ -8,10 +8,11 @@ import org.springframework.data.repository.query.Param;
 
 import com.ssafy.domain.lecture.model.entity.RegisteredLecture;
 import com.ssafy.domain.lecture.model.entity.RegisteredLectureId;
+import com.ssafy.domain.user.model.entity.User;
 
 public interface RegisteredLectureRepository extends JpaRepository<RegisteredLecture, RegisteredLectureId> {
 
-	@Query(value = "SELECT * FROM registered_lecture WHERE user_id = :userId", nativeQuery = true)
-	List<RegisteredLecture> findByUserId(@Param("userId") Long userId);
+	@Query("SELECT r FROM RegisteredLecture r WHERE r.user = :user")
+	List<RegisteredLecture> findAllByUser(@Param("user") User user);
 
 }

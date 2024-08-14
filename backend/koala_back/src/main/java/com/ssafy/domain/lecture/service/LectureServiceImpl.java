@@ -68,14 +68,15 @@ public class LectureServiceImpl implements LectureService {
 
 	@Override
 	public List<RegisteredLectureResponse> getRegisteredLecture() {
-		List<RegisteredLecture> registeredLectures = registeredLectureRepository.findByUserId(
-			userInfoProvider.getCurrentUserId());
+		List<RegisteredLecture> registeredLectures = registeredLectureRepository.findAllByUser(
+			userInfoProvider.getCurrentUser());
 
 		List<RegisteredLectureResponse> registeredLectureResponses = new ArrayList<>();
 		for (RegisteredLecture registeredLecture : registeredLectures) {
 			Long lectureNoteCount = lectureNoteRepository.countByUserIdAndLectureId(
 				userInfoProvider.getCurrentUser(), registeredLecture.getLecture());
 			registeredLectureResponses.add(RegisteredLectureResponse.toDto(registeredLecture, lectureNoteCount));
+			System.out.println("registeredLectureResponses.size() = " + registeredLectureResponses.size());
 		}
 		return registeredLectureResponses;
 	}
@@ -91,8 +92,8 @@ public class LectureServiceImpl implements LectureService {
 
 	@Override
 	public List<LectureNoteResponse> getLectureNote(Long lectureId) {
-		return lectureNoteRepository.findByLectureId(userInfoProvider.getCurrentUserId(), lectureId)
-			.stream()
+		return lectureNoteRepository.findByLectureId(userInfoProvider.getCurrentUser(),
+				lectureRepository.findById(lectureId).orElse(null)).stream()
 			.map(LectureNoteResponse::toDto)
 			.collect(Collectors.toList());
 	}
