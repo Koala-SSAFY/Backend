@@ -11,6 +11,8 @@ import com.ssafy.global.error.exception.KoalaApplicationException;
 import com.ssafy.global.error.exception.KoalaException;
 import com.ssafy.global.error.exception.UserException;
 
+import io.openvidu.java.client.OpenViduHttpException;
+import io.openvidu.java.client.OpenViduJavaClientException;
 import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
