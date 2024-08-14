@@ -62,10 +62,27 @@ public class LectureSessionController {
 		@RequestBody(required = false) Map<String, Object> params) {
 		try {
 			String sessionId = lectureService.getSessionId(lectureId);
+			Session session;
 			if (sessionId == null) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Lecture not found"));
+				if(userInfoProvider.getCurrentAuth()==2){
+					// 선생님임
+					try {
+						SessionProperties properties = SessionProperties.fromJson(params).build();
+						session = openvidu.createSession(properties);
+						// 해당 강의에 세션 아이디 추가
+						lectureService.setSessionId(lectureId, session.getSessionId());
+					} catch (OpenViduJavaClientException | OpenViduHttpException e) {
+						log.error("Error creating session", e);
+						return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.body(Map.of("message", "Error creating session"));
+					}
+				}else{
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Lecture not found"));
+				}
+			}else {
+				session = openvidu.getActiveSession(sessionId);
 			}
-			Session session = openvidu.getActiveSession(sessionId);
+
 			if (session == null) {
 				if(userInfoProvider.getCurrentAuth()==2){
 					// 선생님임
