@@ -36,7 +36,7 @@ public class LectureResponse {
 	public static LectureResponse toDto(Lecture lecture) {
 		return LectureResponse.builder()
 			.lectureId(lecture.getLectureId())
-			.teacherName(lecture.getTeacher().getUsername())
+			.teacherName(lecture.getTeacher().getName())
 			.lectureTitle(lecture.getLectureTitle())
 			.lectureDetail(lecture.getLectureDetail())
 			.sessionId(lecture.getSessionId())

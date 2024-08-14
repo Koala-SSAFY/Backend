@@ -25,7 +25,7 @@ public class RegisteredLectureResponse {
 	public static RegisteredLectureResponse toDto(RegisteredLecture lecture) {
 		return RegisteredLectureResponse.builder()
 			.lectureId(lecture.getLecture().getLectureId())
-			.teacherName(lecture.getLecture().getTeacher().getUsername())
+			.teacherName(lecture.getLecture().getTeacher().getName())
 			.lectureTitle(lecture.getLecture().getLectureTitle())
 			.lectureImgUrl(lecture.getLecture().getLectureImgUrl())
 			.build();
