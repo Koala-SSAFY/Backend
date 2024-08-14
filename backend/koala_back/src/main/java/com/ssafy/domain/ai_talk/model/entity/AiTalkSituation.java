@@ -20,10 +20,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PROTECTED)
 public class AiTalkSituation {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "situation_id")
 	private Long situationId;
+
+	@Column(name = "topic_category")
+	private String topicCategory;
 
 	@Column(name = "situation_title")
 	private String situationTitle;
