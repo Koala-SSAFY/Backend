@@ -1,5 +1,6 @@
 package com.ssafy.domain.lecture.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -60,17 +61,23 @@ public class LectureServiceImpl implements LectureService {
 			user.increaseUserLeaves(1);
 			userRepository.save(user);
 
-			return RegisteredLectureResponse.toDto(registeredLecture);
+			return RegisteredLectureResponse.toDto(registeredLecture, 0L);
 		}
 		return null;
 	}
 
 	@Override
 	public List<RegisteredLectureResponse> getRegisteredLecture() {
-		return registeredLectureRepository.findByUserId(userInfoProvider.getCurrentUserId())
-			.stream()
-			.map(RegisteredLectureResponse::toDto)
-			.collect(Collectors.toList());
+		List<RegisteredLecture> registeredLectures = registeredLectureRepository.findByUserId(
+			userInfoProvider.getCurrentUserId());
+
+		List<RegisteredLectureResponse> registeredLectureResponses = new ArrayList<>();
+		for (RegisteredLecture registeredLecture : registeredLectures) {
+			Long lectureNoteCount = lectureNoteRepository.countByUserIdAndLectureId(
+				userInfoProvider.getCurrentUser(), registeredLecture.getLecture());
+			registeredLectureResponses.add(RegisteredLectureResponse.toDto(registeredLecture, lectureNoteCount));
+		}
+		return registeredLectureResponses;
 	}
 
 	@Override
