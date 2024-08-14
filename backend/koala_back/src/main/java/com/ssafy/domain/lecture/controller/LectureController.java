@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.domain.lecture.model.dto.request.LectureNoteRequest;
 import com.ssafy.domain.lecture.model.dto.response.LectureNoteResponse;
 import com.ssafy.domain.lecture.model.dto.response.LectureResponse;
-import com.ssafy.domain.lecture.model.dto.response.RegisteredLectureResponse;
+import com.ssafy.domain.lecture.model.dto.response.RegisteredLectureListResponse;
 import com.ssafy.domain.lecture.service.LectureService;
 import com.ssafy.domain.sentence.service.SentenceService;
 
@@ -46,11 +46,12 @@ public class LectureController {
 	@Operation(summary = "수강한 강의 조회")
 	@GetMapping
 	public ResponseEntity<?> getAllRegisteredLecture() {
-		List<RegisteredLectureResponse> lectureResponses = lectureService.getRegisteredLecture();
-		if (lectureResponses.isEmpty()) {
+		RegisteredLectureListResponse registeredLectureListResponse = RegisteredLectureListResponse.toDto(
+			lectureService.getRegisteredLecture());
+		if (registeredLectureListResponse.getLectureCount() == 0) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		} else {
-			return ResponseEntity.status(HttpStatus.OK).body(lectureResponses);
+			return ResponseEntity.status(HttpStatus.OK).body(registeredLectureListResponse);
 		}
 	}
 
