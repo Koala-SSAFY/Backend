@@ -7,6 +7,6 @@ public interface BoardCommentService {
 
 	BoardCommentResponse leaveComment(Long boardId, BoardCommentCreateRequest boardCommentCreateRequest);
 
-	void deleteComment(Long commentId);
+	void deleteComment(Long boardId, Long commentId);
 
 }

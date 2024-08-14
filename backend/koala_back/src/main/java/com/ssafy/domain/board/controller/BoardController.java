@@ -119,9 +119,10 @@ public class BoardController {
 	}
 
 	@Operation(summary = "게시글 댓글 삭제")
-	@DeleteMapping("/comments/{comment_id}")
-	public ResponseEntity<?> deleteComment(@PathVariable("comment_id") Long commentId) {
-		boardCommentService.deleteComment(commentId);
+	@DeleteMapping("/{board_id}/comments/{comment_id}")
+	public ResponseEntity<?> deleteComment(@PathVariable("board_id") Long boardId,
+		@PathVariable("comment_id") Long commentId) {
+		boardCommentService.deleteComment(boardId, commentId);
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Successfully deleted comment!"));
 	}
 

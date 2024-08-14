@@ -34,9 +34,9 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
 	@Override
 	@Transactional
-	public void deleteComment(Long commentId) {
+	public void deleteComment(Long boardId, Long commentId) {
 		boardCommentRepository.delete(boardCommentRepository.findById(commentId)
 			.orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다.")));
-		boardService.decreaseCommentNum(commentId);
+		boardService.decreaseCommentNum(boardId);
 	}
 }
