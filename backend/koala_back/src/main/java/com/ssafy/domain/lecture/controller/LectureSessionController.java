@@ -93,10 +93,10 @@ public class LectureSessionController {
 			ConnectionProperties properties = ConnectionProperties.fromJson(params).build();
 			Connection connection = session.createConnection(properties);
 			// 수강하는 강의에 추가: 강의 노트 추가할 때 추가하고 싶으면 lecture controller 이동
-			RegisteredLectureResponse registeredLecture = lectureService.registerLecture(lectureId);
+			lectureService.registerLecture(lectureId);
 			// lectureService.registerd
 			return ResponseEntity.status(HttpStatus.CREATED)
-				.body(Map.of("token", connection.getToken(), "lecture_id", registeredLecture.getLectureId()));
+				.body(Map.of("token", connection.getToken(), "lecture_id", lectureId));
 		} catch (OpenViduJavaClientException | OpenViduHttpException e) {
 			log.error("Error creating connection", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
