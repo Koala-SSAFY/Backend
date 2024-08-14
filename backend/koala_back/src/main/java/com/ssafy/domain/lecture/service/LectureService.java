@@ -11,7 +11,7 @@ public interface LectureService {
 
 	List<LectureResponse> getAllLecture();
 
-	RegisteredLectureResponse registerLecture(Long lectureId);
+	void registerLecture(Long lectureId);
 
 	List<RegisteredLectureResponse> getRegisteredLecture();
 

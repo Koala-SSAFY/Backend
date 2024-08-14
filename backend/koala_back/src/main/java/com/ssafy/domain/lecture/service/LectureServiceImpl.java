@@ -45,9 +45,11 @@ public class LectureServiceImpl implements LectureService {
 
 	@Override
 	@Transactional
-	public RegisteredLectureResponse registerLecture(Long lectureId) {
+	public void registerLecture(Long lectureId) {
 		Optional<Lecture> lecture = lectureRepository.findById(lectureId);
-		if (lecture.isPresent()) {
+
+		if (!registeredLectureRepository.existsById(
+			new RegisteredLectureId(userInfoProvider.getCurrentUserId(), lectureId)) && lecture.isPresent()) {
 			RegisteredLecture registeredLecture = new RegisteredLecture();
 
 			registeredLecture.setUser(userInfoProvider.getCurrentUser());
@@ -60,10 +62,7 @@ public class LectureServiceImpl implements LectureService {
 			User user = userInfoProvider.getCurrentUser();
 			user.increaseUserLeaves(1);
 			userRepository.save(user);
-
-			return RegisteredLectureResponse.toDto(registeredLecture, 0L);
 		}
-		return null;
 	}
 
 	@Override
@@ -76,7 +75,6 @@ public class LectureServiceImpl implements LectureService {
 			Long lectureNoteCount = lectureNoteRepository.countByUserIdAndLectureId(
 				userInfoProvider.getCurrentUser(), registeredLecture.getLecture());
 			registeredLectureResponses.add(RegisteredLectureResponse.toDto(registeredLecture, lectureNoteCount));
-			System.out.println("registeredLectureResponses.size() = " + registeredLectureResponses.size());
 		}
 		return registeredLectureResponses;
 	}
