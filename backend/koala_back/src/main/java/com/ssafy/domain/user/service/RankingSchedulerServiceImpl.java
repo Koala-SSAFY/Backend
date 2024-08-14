@@ -13,9 +13,7 @@ import com.ssafy.domain.user.repository.RankingRepository;
 import com.ssafy.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -28,7 +26,6 @@ public class RankingSchedulerServiceImpl implements RankingSchedulerService {
 	@Transactional
 	@Scheduled(cron = "0 0 * * * *")
 	public void rankingScheduler() {
-		log.info("Ranking 스케줄러 실행");
 		rankingRepository.clearRankingTable();
 
 		List<User> users = userRepository.findAll(Sort.by(Sort.Order.desc("userLevel"), Sort.Order.desc("userExp")));
