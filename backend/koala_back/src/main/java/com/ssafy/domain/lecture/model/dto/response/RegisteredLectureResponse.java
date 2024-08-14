@@ -22,12 +22,16 @@ public class RegisteredLectureResponse {
 	@JsonProperty("lecture_img_url")
 	private String lectureImgUrl;
 
-	public static RegisteredLectureResponse toDto(RegisteredLecture lecture) {
+	@JsonProperty("lecture_note_count")
+	private Long lectureNoteCount;
+
+	public static RegisteredLectureResponse toDto(RegisteredLecture lecture, Long lectureNoteCount) {
 		return RegisteredLectureResponse.builder()
 			.lectureId(lecture.getLecture().getLectureId())
 			.teacherName(lecture.getLecture().getTeacher().getName())
 			.lectureTitle(lecture.getLecture().getLectureTitle())
 			.lectureImgUrl(lecture.getLecture().getLectureImgUrl())
+			.lectureNoteCount(lectureNoteCount)
 			.build();
 	}
 }

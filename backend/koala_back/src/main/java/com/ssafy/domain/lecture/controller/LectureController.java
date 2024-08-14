@@ -48,7 +48,7 @@ public class LectureController {
 	public ResponseEntity<?> getAllRegisteredLecture() {
 		RegisteredLectureListResponse registeredLectureListResponse = RegisteredLectureListResponse.toDto(
 			lectureService.getRegisteredLecture());
-		if (registeredLectureListResponse.getLectureCount() == 0) {
+		if (registeredLectureListResponse.getLectureList().isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		} else {
 			return ResponseEntity.status(HttpStatus.OK).body(registeredLectureListResponse);
