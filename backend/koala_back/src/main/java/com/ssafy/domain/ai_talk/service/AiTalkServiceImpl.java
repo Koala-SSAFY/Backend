@@ -1,16 +1,5 @@
 package com.ssafy.domain.ai_talk.service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-
 import com.ssafy.domain.ai_talk.model.dto.Message;
 import com.ssafy.domain.ai_talk.model.dto.request.AiTalkRequest;
 import com.ssafy.domain.ai_talk.model.dto.request.AiTalkSituationRequest;
@@ -27,125 +16,143 @@ import com.ssafy.domain.user.repository.UserRepository;
 import com.ssafy.domain.user.service.AiTalkLogService;
 import com.ssafy.domain.user.service.StudyTimeService;
 import com.ssafy.global.common.UserInfoProvider;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiTalkServiceImpl implements AiTalkService {
 
-	private final UserInfoProvider userInfoProvider;
-	private final UserRepository userRepository;
-	private final AiTalkRepository aiTalkRepository;
-	private final CacheService cacheService;
-	private final StudyTimeService studyTimeService;
-	private final AiTalkLogService aiTalkLogService;
+    private final UserInfoProvider userInfoProvider;
+    private final UserRepository userRepository;
+    private final AiTalkRepository aiTalkRepository;
+    private final CacheService cacheService;
+    private final StudyTimeService studyTimeService;
+    private final AiTalkLogService aiTalkLogService;
 
-	@Value("${openai.api.key}")
-	private String apiKey;
+    @Value("${openai.api.key}")
+    private String apiKey;
 
-	private final WebClient webClient = WebClient.builder()
-		.baseUrl("https://api.openai.com/v1/")
-		.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-		.build();
+    private final WebClient webClient = WebClient.builder()
+            .baseUrl("https://api.openai.com/v1/")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
 
-	@Override
-	public List<AiTalkSituationResponse> getAllAiTalkSituations() {
-		List<AiTalkSituation> aiTalkSituations = aiTalkRepository.findAll();
-		if (aiTalkSituations.isEmpty())
-			return null;
-		return aiTalkSituations.stream().map(AiTalkSituationResponse::toDto).collect(Collectors.toList());
-	}
+    @Override
+    public List<AiTalkSituationResponse> getAllAiTalkSituations() {
+        List<AiTalkSituation> aiTalkSituations = aiTalkRepository.findAll();
+        if (aiTalkSituations.isEmpty())
+            return null;
+        return aiTalkSituations.stream().map(AiTalkSituationResponse::toDto).collect(Collectors.toList());
+    }
 
-	@Override
-	public List<AiTalkSituationResponse> getAiTalkSituationByTopic(String topic) {
-		List<AiTalkSituation> aiTalkSituations = aiTalkRepository.findByTopic(topic);
-		if (aiTalkSituations.isEmpty())
-			return null;
-		return aiTalkSituations.stream().map(AiTalkSituationResponse::toDto).collect(Collectors.toList());
-	}
+    @Override
+    public List<AiTalkSituationResponse> getAiTalkSituationByTopic(String topic) {
+        List<AiTalkSituation> aiTalkSituations = aiTalkRepository.findByTopic(topic);
+        if (aiTalkSituations.isEmpty())
+            return null;
+        return aiTalkSituations.stream().map(AiTalkSituationResponse::toDto).collect(Collectors.toList());
+    }
 
-	@Override
-	public AiTalkResponse setSituation(Long situationId) {
-		Long userId = userInfoProvider.getCurrentUserId();
-		aiTalkLogService.createStartTimeLog(userId);
+    @Override
+    public AiTalkResponse setSituation(Long situationId) {
+        Long userId = userInfoProvider.getCurrentUserId();
+        aiTalkLogService.createStartTimeLog(userId);
 
-		String loginId = userInfoProvider.getCurrentLoginId();
-		AiTalkSituationRequest aiTalkSituation = aiTalkRepository.findById(situationId)
-			.map(AiTalkSituationRequest::toDto)
-			.orElse(null);
+        String loginId = userInfoProvider.getCurrentLoginId();
+        AiTalkSituationRequest aiTalkSituation = aiTalkRepository.findById(situationId)
+                .map(AiTalkSituationRequest::toDto)
+                .orElse(null);
 
-		if (aiTalkSituation == null) {
-			throw new NoSuchElementException("Situation with id " + situationId + " not found.");
-		}
+        if (aiTalkSituation == null) {
+            throw new NoSuchElementException("Situation with id " + situationId + " not found.");
+        }
 
-		cacheService.initCacheMemory(loginId, aiTalkSituation);
-		GPTSituationRequest gptSituationRequest = new GPTSituationRequest(aiTalkSituation);
-		GPTResponse gptResponse = webClient.method(HttpMethod.POST)
-			.uri("chat/completions")
-			.header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-			.bodyValue(gptSituationRequest)
-			.retrieve()
-			.bodyToMono(GPTResponse.class)
-			.block();
+        cacheService.initCacheMemory(loginId, aiTalkSituation);
+        GPTSituationRequest gptSituationRequest = new GPTSituationRequest(aiTalkSituation);
+        GPTResponse gptResponse = webClient.method(HttpMethod.POST)
+                .uri("chat/completions")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .bodyValue(gptSituationRequest)
+                .retrieve()
+                .bodyToMono(GPTResponse.class)
+                .block();
 
-		String aiResponse = gptResponse.getChoices().get(0).getMessage().getContent();
-		cacheService.addChatHistory(loginId, new Message("assistant", aiResponse));
-		return new AiTalkResponse(aiResponse);
-	}
+        String aiResponse = gptResponse.getChoices().get(0).getMessage().getContent();
+        cacheService.addChatHistory(loginId, new Message("assistant", aiResponse));
+        return new AiTalkResponse(aiTalkSituation.getUserRole(), aiTalkSituation.getAiRole(), aiResponse);
+    }
 
-	@Override
-	public AiTalkResponse getAiResponse(AiTalkRequest aiTalkRequest) {
-		String loginId = userInfoProvider.getCurrentLoginId();
-		// 이전 대화 가져오기
-		List<Message> chatHistory = cacheService.getChatHistory(loginId);
-		log.info(chatHistory.toString());
-		GPTRequest gptRequest = new GPTRequest(chatHistory);
-		gptRequest.addMessage(aiTalkRequest.getMessage());
+    @Override
+    public AiTalkResponse getAiResponse(AiTalkRequest aiTalkRequest) {
+        AiTalkSituationRequest aiTalkSituation = aiTalkRepository.findById(aiTalkRequest.getSituationId())
+                .map(AiTalkSituationRequest::toDto)
+                .orElse(null);
 
-		GPTResponse gptResponse = webClient.method(HttpMethod.POST)
-			.uri("chat/completions")
-			.header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-			.bodyValue(gptRequest)
-			.retrieve()
-			.bodyToMono(GPTResponse.class)
-			.block();
+        if (aiTalkSituation == null) {
+            throw new NoSuchElementException("Situation with id " + aiTalkRequest.getSituationId() + " not found.");
+        }
 
-		String aiResponse = gptResponse.getChoices().get(0).getMessage().getContent();
+        String loginId = userInfoProvider.getCurrentLoginId();
+        // 이전 대화 가져오기
+        List<Message> chatHistory = cacheService.getChatHistory(loginId);
+        log.info(chatHistory.toString());
+        GPTRequest gptRequest = new GPTRequest(chatHistory);
+        gptRequest.addMessage(aiTalkRequest.getMessage());
 
-		cacheService.addChatHistory(loginId, new Message("user", aiTalkRequest.getMessage()));
-		cacheService.addChatHistory(loginId, new Message("assistant", aiResponse));
+        GPTResponse gptResponse = webClient.method(HttpMethod.POST)
+                .uri("chat/completions")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .bodyValue(gptRequest)
+                .retrieve()
+                .bodyToMono(GPTResponse.class)
+                .block();
 
-		return new AiTalkResponse(aiResponse);
-	}
+        String aiResponse = gptResponse.getChoices().get(0).getMessage().getContent();
 
-	@Override
-	public AiTalkFinishResponse finishAiResponse() {
-		// 이외에 AI 응답 끝내는 로직 추가
-		User user = userInfoProvider.getCurrentUser();
-		cacheService.clearChatHistory(user.getLoginId());
+        cacheService.addChatHistory(loginId, new Message("user", aiTalkRequest.getMessage()));
+        cacheService.addChatHistory(loginId, new Message("assistant", aiResponse));
 
-		aiTalkLogService.createEndTimeLog(user.getUserId());
-		int leaves = calculateLeaves(studyTimeService.increaseAiTalkMinutes());
 
-		user.increaseUserLeaves(leaves);
-		userRepository.save(user);
+        return new AiTalkResponse(aiTalkSituation.getUserRole(), aiTalkSituation.getAiRole(), aiResponse);
+    }
 
-		return AiTalkFinishResponse.toDto(leaves);
+    @Override
+    public AiTalkFinishResponse finishAiResponse() {
+        // 이외에 AI 응답 끝내는 로직 추가
+        User user = userInfoProvider.getCurrentUser();
+        cacheService.clearChatHistory(user.getLoginId());
 
-	}
+        aiTalkLogService.createEndTimeLog(user.getUserId());
+        int leaves = calculateLeaves(studyTimeService.increaseAiTalkMinutes());
 
-	public int calculateLeaves(int aiTalkTime) {
-		if (aiTalkTime >= 15)
-			return 10;
-		if (aiTalkTime >= 8)
-			return 5;
-		if (aiTalkTime >= 5)
-			return 3;
-		if (aiTalkTime >= 2)
-			return 1;
-		return 0;
-	}
+        user.increaseUserLeaves(leaves);
+        userRepository.save(user);
+
+        return AiTalkFinishResponse.toDto(leaves);
+
+    }
+
+    public int calculateLeaves(int aiTalkTime) {
+        if (aiTalkTime >= 15)
+            return 10;
+        if (aiTalkTime >= 8)
+            return 5;
+        if (aiTalkTime >= 5)
+            return 3;
+        if (aiTalkTime >= 2)
+            return 1;
+        return 0;
+    }
 }
