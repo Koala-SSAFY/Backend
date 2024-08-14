@@ -19,7 +19,7 @@ public class LectureChatServiceImpl implements LectureChatService {
 
 	@Override
 	public void sendLectureChat(Long lectureId, LectureChatRequest chat) {
-		messagingTemplate.convertAndSend("/lectures/" + lectureId, LectureChatResponse.builder()
+		messagingTemplate.convertAndSend("/api/lecture-chat/sub/" + lectureId, LectureChatResponse.builder()
 			.sender(chat.getSender())
 			.message(chat.getMessage())
 			.sendingTime(LocalDateTime.now())
