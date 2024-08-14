@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.ssafy.domain.user.model.entity.Auth;
 import com.ssafy.domain.user.model.entity.User;
 import com.ssafy.domain.user.repository.UserRepository;
 
@@ -67,6 +68,20 @@ public class UserInfoProvider {
 
 		return userRepository.findByLoginId(loginId)
 			.map(User::getNickname)
+			.orElseThrow(() -> new BadCredentialsException("No user found with login ID: " + loginId));
+	}
+
+	public Long getCurrentAuth() {
+		Authentication authentication = getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new BadCredentialsException("User is not authenticated");
+		}
+		Object principal = authentication.getPrincipal();
+		String loginId =
+			principal instanceof UserDetails ? ((UserDetails)principal).getUsername() : principal.toString();
+
+		return userRepository.findByLoginId(loginId)
+			.map(User::getAuth).map(Auth::getAuthId)
 			.orElseThrow(() -> new BadCredentialsException("No user found with login ID: " + loginId));
 	}
 }

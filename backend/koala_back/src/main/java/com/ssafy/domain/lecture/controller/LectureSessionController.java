@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.domain.lecture.model.dto.response.RegisteredLectureResponse;
 import com.ssafy.domain.lecture.service.LectureService;
+import com.ssafy.global.common.UserInfoProvider;
 
 import io.openvidu.java.client.Connection;
 import io.openvidu.java.client.ConnectionProperties;
@@ -34,6 +35,7 @@ public class LectureSessionController {
 
 	private final OpenVidu openvidu;
 	private final LectureService lectureService;
+	private final UserInfoProvider userInfoProvider;
 
 	@Operation(summary = "강의 session 생성")
 	@PostMapping("/{lecture_id}/session")
@@ -65,7 +67,21 @@ public class LectureSessionController {
 			}
 			Session session = openvidu.getActiveSession(sessionId);
 			if (session == null) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Session not found"));
+				if(userInfoProvider.getCurrentAuth()==2){
+					// 선생님임
+					try {
+						SessionProperties properties = SessionProperties.fromJson(params).build();
+						session = openvidu.createSession(properties);
+						// 해당 강의에 세션 아이디 추가
+						lectureService.setSessionId(lectureId, session.getSessionId());
+					} catch (OpenViduJavaClientException | OpenViduHttpException e) {
+						log.error("Error creating session", e);
+						return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.body(Map.of("message", "Error creating session"));
+					}
+				}else{
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Session not found"));
+				}
 			}
 			ConnectionProperties properties = ConnectionProperties.fromJson(params).build();
 			Connection connection = session.createConnection(properties);
