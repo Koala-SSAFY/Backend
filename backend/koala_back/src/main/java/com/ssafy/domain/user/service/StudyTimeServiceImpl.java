@@ -69,7 +69,8 @@ public class StudyTimeServiceImpl implements StudyTimeService {
 	@Transactional
 	public void increaseDictationCount(Integer dictationCount) {
 		Long userId = userInfoProvider.getCurrentUserId();
-		StudyTime studyTime = studyTimeRepository.findByUserIdAndTimeCalType(userId, 1);
+		Integer day = LocalDateTime.now().getDayOfWeek().getValue();
+		StudyTime studyTime = studyTimeRepository.findByUserIdAndTimeCalType(userId, day);
 		studyTime.increaseSentenceNum(dictationCount);
 		studyTimeRepository.save(studyTime);
 
@@ -80,7 +81,8 @@ public class StudyTimeServiceImpl implements StudyTimeService {
 	@Transactional
 	public void increaseLectureCount() {
 		Long userId = userInfoProvider.getCurrentUserId();
-		StudyTime studyTime = studyTimeRepository.findByUserIdAndTimeCalType(userId, 1);
+		Integer day = LocalDateTime.now().getDayOfWeek().getValue();
+		StudyTime studyTime = studyTimeRepository.findByUserIdAndTimeCalType(userId, day);
 		studyTime.increaseLectureNum();
 		studyTimeRepository.save(studyTime);
 
@@ -91,7 +93,8 @@ public class StudyTimeServiceImpl implements StudyTimeService {
 	@Transactional
 	public Integer increaseAiTalkMinutes() {
 		Long userId = userInfoProvider.getCurrentUserId();
-		StudyTime studyTime = studyTimeRepository.findByUserIdAndTimeCalType(userId, 1);
+		Integer day = LocalDateTime.now().getDayOfWeek().getValue();
+		StudyTime studyTime = studyTimeRepository.findByUserIdAndTimeCalType(userId, day);
 		Integer talkMinutes = aiTalkLogService.calculateTalkTime(userId);
 		studyTime.increaseTalkTime(talkMinutes);
 		studyTimeRepository.save(studyTime);
@@ -103,25 +106,16 @@ public class StudyTimeServiceImpl implements StudyTimeService {
 	@Override
 	@Transactional
 	public void increaseTotalStudyTime(Long userId, Integer studyType, Integer studyTime) {
-		Integer day = LocalDateTime.now().getDayOfWeek().getValue();
-		StudyTime userStudyTime = studyTimeRepository.findByUserIdAndTimeCalType(userId, 2);
-		StudyTime userStudyTimeByDay = studyTimeRepository.findByUserIdAndTimeCalType(userId, day);
+		StudyTime userStudyTime = studyTimeRepository.findByUserIdAndTimeCalType(userId, 0);
 		switch (studyType) {
-			case 0: // AI 회화
+			case 0 -> // AI 회화
 				userStudyTime.increaseTalkTime(studyTime);
-				userStudyTimeByDay.increaseTalkTime(studyTime);
-				break;
-			case 1: // 받아쓰기
+			case 1 -> // 받아쓰기
 				userStudyTime.increaseSentenceNum(studyTime);
-				userStudyTimeByDay.increaseSentenceNum(studyTime);
-				break;
-			case 2: // 강의 수
+			case 2 -> // 강의 수
 				userStudyTime.increaseLectureNum();
-				userStudyTimeByDay.increaseLectureNum();
-				break;
 		}
 		studyTimeRepository.save(userStudyTime);
-		studyTimeRepository.save(userStudyTimeByDay);
 	}
 
 }
