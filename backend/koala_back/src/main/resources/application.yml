@@ -17,6 +17,8 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
+      jdbc:
+        time-zone: Asia/Seoul
   servlet:
     multipart:
       enabled: true
